@@ -1,28 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Profile from "./pages/Profile";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
-
-function LoginPlaceholder() {
-  return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Página de Login</h1>
-      <p>O colega está a trabalhar nisto.</p>
-      <br />
-      <a href="/perfil" style={{ marginRight: '20px', color: 'blue' }}>Ir para Perfil</a>
-      <a href="/register" style={{ color: 'blue' }}>Ir para Registo</a>
-    </div>
-  );
-}
+import Simulation from "./pages/Simulation";
+import History from "./pages/History";
+import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPlaceholder />} />
-
+        <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        <Route path="/simulacao" element={<Simulation />} />
+        <Route path="/historico" element={<History />} />
         <Route path="/perfil" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   );
