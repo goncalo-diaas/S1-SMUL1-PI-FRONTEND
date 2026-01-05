@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
@@ -9,6 +9,7 @@ export default function Admin() {
     const [usuarios, setUsuarios] = useState([]);
     const [editandoUsuario, setEditandoUsuario] = useState(null);
     const [dadosEdicao, setDadosEdicao] = useState({ nome: '', email: '', password: '' });
+    const [pesquisa, setPesquisa] = useState('');
 
     useEffect(() => {
         // Verifica se o utilizador é admin
@@ -77,7 +78,7 @@ export default function Admin() {
                     <h2 style={{ margin: "0 0 8px 0", fontSize: "32px" }}>
                         Gestão de Utilizadores
                     </h2>
-                    <p style={{ margin: 0, fontSize: "15px", opacity: 0.9 }}>Visualize e gerencie todos os utilizadores do sistema</p>
+                    <p style={{ margin: 0, fontSize: "15px", opacity: 0.9 }}>Visualize e gira todos os utilizadores do sistema</p>
                 </div>
                 <Link 
                     to="/simulacao"
@@ -98,6 +99,27 @@ export default function Admin() {
 
             {/* Tabela de Utilizadores */}
             <div style={{ padding: "40px", maxWidth: "1200px", margin: "0 auto" }}>
+                {/* Barra de Pesquisa */}
+                <div style={{ marginBottom: "25px" }}>
+                    <input
+                        type="text"
+                        placeholder="🔍 Pesquisar por nome ou email..."
+                        value={pesquisa}
+                        onChange={(e) => setPesquisa(e.target.value)}
+                        style={{
+                            width: "100%",
+                            padding: "12px 20px",
+                            fontSize: "14px",
+                            border: "2px solid #e0e0e0",
+                            borderRadius: "8px",
+                            outline: "none",
+                            transition: "border-color 0.2s",
+                            boxSizing: "border-box"
+                        }}
+                        onFocus={(e) => e.target.style.borderColor = "#63b099"}
+                        onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                    />
+                </div>
                 <div style={{
                     backgroundColor: "white",
                     borderRadius: "12px",
@@ -122,7 +144,13 @@ export default function Admin() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {usuarios.map((usuario, index) => (
+                                    {usuarios
+                                        .filter(usuario => {
+                                            const termoPesquisa = pesquisa.toLowerCase();
+                                            return usuario.nome.toLowerCase().includes(termoPesquisa) || 
+                                                   usuario.email.toLowerCase().includes(termoPesquisa);
+                                        })
+                                        .map((usuario, index) => (
                                         <tr key={index} style={{ borderBottom: "1px solid #f0f0f0" }}>
                                             {editandoUsuario === usuario.email ? (
                                                 <>

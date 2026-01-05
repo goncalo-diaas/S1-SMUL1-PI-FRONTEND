@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Botao from "../components/Botao";
 import Input from "../components/Input";
@@ -9,10 +9,39 @@ import logo from "../assets/medceilogo.png";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
 
     console.log("Login component rendered");
+
+    // Redireciona se já estiver autenticado
+    useEffect(() => {
+        if (user) {
+            navigate('/simulacao', { replace: true });
+        }
+    }, [user, navigate]);
+
+    // Se está autenticado, mostra loading enquanto redireciona
+    if (user) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                minHeight: '100vh',
+                backgroundColor: '#F3F8F6'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ 
+                        fontSize: '48px', 
+                        marginBottom: '20px',
+                        animation: 'spin 1s linear infinite'
+                    }}>⏳</div>
+                    <p style={{ color: '#63b099', fontSize: '18px' }}>Redirecionando...</p>
+                </div>
+            </div>
+        );
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -21,7 +50,7 @@ export default function Login() {
         if (email === "admin@medcei.com" && password === "admin123123") {
             login({ nome: "Administrador", email: "admin@medcei.com", isAdmin: true });
             alert("Login de administrador efetuado com sucesso!");
-            navigate('/admin');
+            navigate('/simulacao');
             return;
         }
 

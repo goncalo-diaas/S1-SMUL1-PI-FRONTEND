@@ -4,15 +4,17 @@ import Navbar from "../components/Navbar";
 import Card from "../components/Card";
 import Botao from "../components/Botao";
 import Input from "../components/Input";
+import { useAuth } from "../context/AuthContext";
 
 function Profile() {
+    const { user: authUser } = useAuth();
 
     const [isEditing, setIsEditing] = useState(false);
 
     const [user, setUser] = useState({
-        nome: "Miguel Pereira",
-        email: "miguelpereira11@gmail.com",
-        tipo: "Utilizador",
+        nome: authUser?.nome || "",
+        email: authUser?.email || "",
+        tipo: authUser?.isAdmin ? "Administrador" : "Utilizador",
         membroDesde: "06/12/2025"
     });
 
@@ -50,18 +52,45 @@ function Profile() {
                         <p style={{ opacity: '0.9', marginTop: '5px' }}>Configure as suas informações pessoais</p>
                     </div>
 
-                    <Link to="/" style={{
-                        color: 'white',
-                        border: '1px solid white',
-                        padding: '10px 20px',
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        fontWeight: 'bold',
-                        fontSize: '1rem'
-                    }}>
-                        ← Voltar ao Início
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        {authUser?.isAdmin && (
+                            <Link to="/admin" style={{
+                                color: 'white',
+                                border: '1px solid white',
+                                padding: '10px 20px',
+                                borderRadius: '8px',
+                                textDecoration: 'none',
+                                fontWeight: 'bold',
+                                fontSize: '1rem'
+                            }}>
+                                Gerir Utilizadores
+                            </Link>
+                        )}
 
-                    </Link>
+                        <Link to="/historico" style={{
+                            color: 'white',
+                            border: '1px solid white',
+                            padding: '10px 20px',
+                            borderRadius: '8px',
+                            textDecoration: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '1rem'
+                        }}>
+                            Histórico
+                        </Link>
+
+                        <Link to="/simulacao" style={{
+                            color: 'white',
+                            border: '1px solid white',
+                            padding: '10px 20px',
+                            borderRadius: '8px',
+                            textDecoration: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '1rem'
+                        }}>
+                            ← Voltar ao Simulador
+                        </Link>
+                    </div>
                 </div>
             </div>
 

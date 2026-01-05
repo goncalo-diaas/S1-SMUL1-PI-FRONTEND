@@ -10,15 +10,18 @@ export default function Simulation() {
     const { user } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const [nomeSimulacao, setNomeSimulacao] = useState("COVID-19 Cenário Base");
-    const [populacaoTotal, setPopulacaoTotal] = useState("100000");
-    const [infectadosIniciais, setInfectadosIniciais] = useState("10");
-    const [taxaTransmissao, setTaxaTransmissao] = useState("0.5");
-    const [taxaRecuperacao, setTaxaRecuperacao] = useState("0.1");
-    const [taxaMortalidade, setTaxaMortalidade] = useState("0.02");
-    const [duracao, setDuracao] = useState("365");
+    const [nomeSimulacao, setNomeSimulacao] = useState("");
+    const [populacaoTotal, setPopulacaoTotal] = useState("");
+    const [infectadosIniciais, setInfectadosIniciais] = useState("");
+    const [taxaTransmissao, setTaxaTransmissao] = useState("");
+    const [taxaRecuperacao, setTaxaRecuperacao] = useState("");
+    const [taxaMortalidade, setTaxaMortalidade] = useState("");
+    const [duracao, setDuracao] = useState("");
     const [resultado, setResultado] = useState(null);
     const [dadosGrafico, setDadosGrafico] = useState([]);
+    
+    // Verifica se está em modo visualização (vindo do histórico)
+    const modoVisualizacao = location.state?.simulacao ? true : false;
     
     // Proteção de rota - redireciona para login se não estiver autenticado
     useEffect(() => {
@@ -201,6 +204,94 @@ export default function Simulation() {
     // Nome do utilizador com primeira letra maiúscula
     const userName = user?.nome ? user.nome.charAt(0).toUpperCase() + user.nome.slice(1) : "Utilizador";
 
+    // Se estiver em modo visualização, mostra apenas os resultados
+    if (modoVisualizacao && resultado) {
+        return (
+            <div style={{ minHeight: "100vh", backgroundColor: "#F3F8F6" }}>
+                <Navbar nome={userName} />
+                
+                <div style={{ padding: "40px 20px" }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        padding: '40px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                        maxWidth: '1200px',
+                        margin: '0 auto'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                            <h1 style={{ color: "#63b099", margin: 0 }}>Detalhes da Simulação: {resultado.nome}</h1>
+                            <button 
+                                onClick={() => navigate('/historico')}
+                                style={{
+                                    backgroundColor: '#63b099',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '10px 20px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold'
+                                }}
+                            >
+                                ← Voltar ao Histórico
+                            </button>
+                        </div>
+
+                        {/* Resultados */}
+                        <div style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                            gap: "20px",
+                            marginBottom: "30px"
+                        }}>
+                            <div style={{ backgroundColor: "#f8f9fa", padding: "20px", borderRadius: "8px" }}>
+                                <h3 style={{ color: "#63b099", margin: "0 0 10px 0" }}>Pico de Infecções</h3>
+                                <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>{resultado.pico.toLocaleString()}</p>
+                                <p style={{ color: "#666", margin: "5px 0 0 0" }}>Dia {resultado.diaPico}</p>
+                            </div>
+                            <div style={{ backgroundColor: "#f8f9fa", padding: "20px", borderRadius: "8px" }}>
+                                <h3 style={{ color: "#63b099", margin: "0 0 10px 0" }}>Total de Óbitos</h3>
+                                <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>{resultado.obitos.toLocaleString()}</p>
+                            </div>
+                            <div style={{ backgroundColor: "#f8f9fa", padding: "20px", borderRadius: "8px" }}>
+                                <h3 style={{ color: "#63b099", margin: "0 0 10px 0" }}>Recuperados</h3>
+                                <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>{resultado.recuperados.toLocaleString()}</p>
+                            </div>
+                            <div style={{ backgroundColor: "#f8f9fa", padding: "20px", borderRadius: "8px" }}>
+                                <h3 style={{ color: "#63b099", margin: "0 0 10px 0" }}>Suscetíveis Finais</h3>
+                                <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>{resultado.suscetiveisFinais.toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                        {/* Gráfico */}
+                        <div style={{ marginTop: "40px" }}>
+                            <h3 style={{ color: "#63b099", marginBottom: "20px", textAlign: "center" }}>Evolução da Epidemia</h3>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <LineChart data={dadosGrafico} margin={{ top: 5, right: 30, left: 80, bottom: 80 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                                    <XAxis 
+                                        dataKey="dia" 
+                                        label={{ value: 'Dias', position: 'insideBottom', offset: -5 }}
+                                        interval={9}
+                                    />
+                                    <YAxis label={{ value: 'População', angle: -90, position: 'insideLeft', dx: -10 }} />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: 'white', border: '1px solid #ddd', borderRadius: '8px' }}
+                                    />
+                                    <Legend verticalAlign="bottom" height={50} wrapperStyle={{ paddingTop: '40px', paddingLeft: '50px' }} />
+                                    <Line type="monotone" dataKey="Infectados" stroke="#FF6B6B" strokeWidth={3} dot={false} />
+                                    <Line type="monotone" dataKey="Recuperados" stroke="#4ECDC4" strokeWidth={3} dot={false} />
+                                    <Line type="monotone" dataKey="Suscetíveis" stroke="#95E1D3" strokeWidth={3} dot={false} />
+                                    <Line type="monotone" dataKey="Óbitos" stroke="#F38181" strokeWidth={3} dot={false} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#F3F8F6" }}>
             <Navbar nome={userName} />
@@ -379,17 +470,18 @@ export default function Simulation() {
                         }}>
                             <h3 style={{ color: "#63b099", marginBottom: "20px", textAlign: "center" }}>Evolução da Epidemia</h3>
                             <ResponsiveContainer width="100%" height={400}>
-                                <LineChart data={dadosGrafico} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                <LineChart data={dadosGrafico} margin={{ top: 5, right: 30, left: 80, bottom: 80 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                                     <XAxis 
                                         dataKey="dia" 
-                                        label={{ value: 'Dias', position: 'insideBottom', offset: -5 }} 
+                                        label={{ value: 'Dias', position: 'insideBottom', offset: -5 }}
+                                        interval={9}
                                     />
-                                    <YAxis label={{ value: 'População', angle: -90, position: 'insideLeft' }} />
+                                    <YAxis label={{ value: 'População', angle: -90, position: 'insideLeft', dx: -10 }} />
                                     <Tooltip 
                                         contentStyle={{ backgroundColor: 'white', border: '1px solid #ddd', borderRadius: '8px' }}
                                     />
-                                    <Legend />
+                                    <Legend verticalAlign="bottom" height={50} wrapperStyle={{ paddingTop: '40px', paddingLeft: '50px' }} />
                                     <Line type="monotone" dataKey="Infectados" stroke="#FF6B6B" strokeWidth={3} dot={false} />
                                     <Line type="monotone" dataKey="Recuperados" stroke="#4ECDC4" strokeWidth={3} dot={false} />
                                     <Line type="monotone" dataKey="Suscetíveis" stroke="#95E1D3" strokeWidth={3} dot={false} />

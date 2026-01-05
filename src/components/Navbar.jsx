@@ -1,9 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/medceilogo.png";
 
 function Navbar({ nome = "Utilizador" }) {
     const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    function handleLogout() {
+        logout();
+        navigate("/", { replace: true });
+    }
 
     return (
         <nav style={{
@@ -32,9 +38,8 @@ function Navbar({ nome = "Utilizador" }) {
                     Meu Perfil
                 </Link>
 
-                <Link 
-                    to="/" 
-                    onClick={logout}
+                <button 
+                    onClick={handleLogout}
                     style={{
                         textDecoration: 'none',
                         color: '#d32f2f',
@@ -42,10 +47,12 @@ function Navbar({ nome = "Utilizador" }) {
                         padding: '8px 16px',
                         borderRadius: '6px',
                         fontSize: '1rem',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        backgroundColor: 'white',
+                        cursor: 'pointer'
                     }}>
                     Sair
-                </Link>
+                </button>
             </div>
         </nav>
     );
