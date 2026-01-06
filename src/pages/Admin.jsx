@@ -10,6 +10,7 @@ import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import StatsGrid from "../components/admin/StatsGrid";
 import UsersTable from "../components/admin/UsersTable";
+import ChangePasswordModal from "../components/admin/ChangePasswordModal";
 import { Shield } from "lucide-react";
 
 /**
@@ -47,6 +48,10 @@ export default function Admin() {
     const [utilizadores, setUtilizadores] = useState([]); // Lista de todos os utilizadores
     const [editandoUsuario, setEditandoUsuario] = useState(null); // Email do utilizador em edição (null se nenhum)
     const [dadosEdicao, setDadosEdicao] = useState({ nome: '', email: '', password: '' }); // Dados temporários durante edição
+    
+    // Estados do modal de alteração de password
+    const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     /**
      * Proteção de rota: apenas administradores acedem
@@ -128,6 +133,38 @@ export default function Admin() {
         }
     }
 
+    /**
+     * Abre modal de alteração de password
+     * - Define utilizador selecionado
+     * - Abre modal
+     */
+    function handleOpenPasswordModal(usuario) {
+        setSelectedUser(usuario);
+        setPasswordModalOpen(true);
+    }
+
+    /**
+     * Altera password do utilizador
+     * - Busca utilizador no localStorage
+     * - Atualiza password
+     * - Persiste alterações
+     * - Fecha modal
+     * - Mostra toast de sucesso
+     */
+    function handleChangePassword(newPassword) {
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const index = registeredUsers.findIndex(u => u.email === selectedUser.email);
+        
+        if (index !== -1) {
+            registeredUsers[index].password = newPassword;
+            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+            setUtilizadores(registeredUsers);
+            setPasswordModalOpen(false);
+            setSelectedUser(null);
+            showToast(`Password de ${selectedUser.email} alterada com sucesso!`, "success");
+        }
+    }
+
     // Proteção adicional: retorna null se não for admin (evita flash de conteúdo)
     if (!user || !user.isAdmin) {
         return null;
@@ -174,10 +211,22 @@ export default function Admin() {
                         onSave={handleGuardarEdicao}
                         onCancel={handleCancelarEdicao}
                         onDelete={handleEliminar}
+                        onChangePassword={handleOpenPasswordModal}
                         currentUserEmail={user?.email}
                     />
                 </Card>
             </div>
+
+            {/* Modal de Alteração de Password */}
+            <ChangePasswordModal
+                isOpen={passwordModalOpen}
+                onClose={() => {
+                    setPasswordModalOpen(false);
+                    setSelectedUser(null);
+                }}
+                onConfirm={handleChangePassword}
+                userEmail={selectedUser?.email || ''}
+            />
 
             {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>

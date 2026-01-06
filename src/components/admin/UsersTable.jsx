@@ -20,6 +20,7 @@ import { useWindowSize } from '../../hooks/useWindowSize';
  * - onSave: callback para guardar alterações
  * - onCancel: callback para cancelar edição
  * - onDelete: callback para eliminar utilizador
+ * - onChangePassword: callback para alterar password de utilizador
  * - currentUserEmail: email do utilizador atual (para destacar)
  */
 export default function UsersTable({ 
@@ -31,6 +32,7 @@ export default function UsersTable({
     onSave,
     onCancel,
     onDelete,
+    onChangePassword,
     currentUserEmail
 }) {
     const { width: windowWidth } = useWindowSize();
@@ -130,6 +132,7 @@ export default function UsersTable({
                                 utilizador={utilizador}
                                 onEdit={onEdit}
                                 onDelete={onDelete}
+                                onChangePassword={onChangePassword}
                                 isCurrentUser={isCurrentUser}
                             />
                         );

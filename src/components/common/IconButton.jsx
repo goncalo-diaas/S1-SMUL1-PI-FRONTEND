@@ -9,6 +9,7 @@ export default function IconButton({
         primary: { bg: "#63b099", hover: "#52a088" },
         danger: { bg: "#ef4444", hover: "#dc2626" },
         success: { bg: "#10b981", hover: "#059669" },
+        warning: { bg: "#f59e0b", hover: "#d97706" },
         secondary: { bg: "#6b7280", hover: "#4b5563" }
     };
 

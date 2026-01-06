@@ -14,7 +14,7 @@ import Input from "../components/common/Input";
  * 
  * Funcionalidades:
  * - Simulação matemática de propagação de doenças usando modelo SIRD
- * - Modelo SIRD: S (Suscetíveis), I (Infectados), R (Recuperados), D (Óbitos)
+ * - Modelo SIRD: S (Suscetíveis), I (Infetados), R (Recuperados), D (Óbitos)
  * - Formulário de parâmetros epidemiológicos
  * - Cálculo de resultados: pico de infeção, total de óbitos, taxa de mortalidade
  * - Gráfico interativo com Recharts mostrando evolução temporal
@@ -24,8 +24,8 @@ import Input from "../components/common/Input";
  * - Design totalmente responsivo
  * 
  * Algoritmo SIRD (Equações Diferenciais):
- * dS/dt = -β * S * I / N              (Novos infectados)
- * dI/dt = β * S * I / N - γ * I - μ * I  (Infectados ativos: novos - recuperados - óbitos)
+ * dS/dt = -β * S * I / N              (Novos infetados)
+ * dI/dt = β * S * I / N - γ * I - μ * I  (Infetados ativos: novos - recuperados - óbitos)
  * dR/dt = γ * I                         (Novos recuperados)
  * dD/dt = μ * I                         (Novos óbitos)
  * 
@@ -33,7 +33,7 @@ import Input from "../components/common/Input";
  * - N: População total
  * - β (beta): Taxa de transmissão (contactos efetivos por dia)
  * - γ (gamma): Taxa de recuperação (1/período infecioso)
- * - μ (mu): Taxa de mortalidade (fração de infectados que morrem)
+ * - μ (mu): Taxa de mortalidade (fração de infetados que morrem)
  * - dt: Passo de tempo (0.1 dia para maior precisão)
  * 
  * Fluxo:
@@ -54,7 +54,7 @@ export default function Simulation() {
     // Estados do formulário de parâmetros
     const [nomeSimulacao, setNomeSimulacao] = useState("");
     const [populacaoTotal, setPopulacaoTotal] = useState("");
-    const [infectadosIniciais, setInfectadosIniciais] = useState("");
+    const [infetadosIniciais, setInfetadosIniciais] = useState("");
     const [taxaTransmissao, setTaxaTransmissao] = useState("");
     const [taxaRecuperacao, setTaxaRecuperacao] = useState("");
     const [taxaMortalidade, setTaxaMortalidade] = useState("");
@@ -112,8 +112,8 @@ export default function Simulation() {
             const dias = simulacao.duracao || 365;
             
             // Condições iniciais do modelo SIRD
-            let S = N - I0; // Suscetíveis = população total - infectados iniciais
-            let I = I0; // Infectados iniciais
+            let S = N - I0; // Suscetíveis = população total - infetados iniciais
+            let I = I0; // Infetados iniciais
             let R = 0; // Nenhum recuperado ainda
             let D = 0; // Nenhum óbito ainda
             
@@ -121,7 +121,7 @@ export default function Simulation() {
             graficoDados.push({
                 dia: 0,
                 Suscetíveis: Math.round(S),
-                Infectados: Math.round(I),
+                Infetados: Math.round(I),
                 Recuperados: 0,
                 Óbitos: 0
             });
@@ -136,27 +136,27 @@ export default function Simulation() {
                 for (let substep = 0; substep < passosPorDia; substep++) {
                     /**
                      * Equações diferenciais do modelo SIRD (método de Euler)
-                     * 
+                    /**
                      * dS/dt = -β * S * I / N
-                     * Taxa de novos infectados = contactos * prob. de encontro com infectado
+                     * Taxa de novos infetados = contactos * prob. de encontro com infetado
                      */
-                    const novosInfectados = (beta * S * I / N) * dt;
+                    const novosInfetados = (beta * S * I / N) * dt;
                     
                     /**
                      * dR/dt = γ * I * (1 - μ)
-                     * Taxa de recuperação = fração de infectados que recupera (não morre)
+                     * Taxa de recuperação = fração de infetados que recupera (não morre)
                      */
                     const novosRecuperados = gamma * I * (1 - mu) * dt;
                     
                     /**
                      * dD/dt = γ * I * μ
-                     * Taxa de óbitos = fração de infectados que morre
+                     * Taxa de óbitos = fração de infetados que morre
                      */
                     const novosMortos = gamma * I * mu * dt;
 
                     // Atualiza compartimentos do modelo (garante valores não-negativos)
-                    S = Math.max(0, S - novosInfectados); // Suscetíveis diminuem
-                    I = Math.max(0, I + novosInfectados - novosRecuperados - novosMortos); // Infectados: entram novos, saem recuperados e mortos
+                    S = Math.max(0, S - novosInfetados); // Suscetíveis diminuem
+                    I = Math.max(0, I + novosInfetados - novosRecuperados - novosMortos); // Infetados: entram novos, saem recuperados e mortos
                     R = R + novosRecuperados; // Recuperados aumentam
                     D = D + novosMortos; // Óbitos aumentam
                 }
@@ -165,7 +165,7 @@ export default function Simulation() {
                 graficoDados.push({
                     dia: dia,
                     Suscetíveis: Math.round(S),
-                    Infectados: Math.round(I),
+                    Infetados: Math.round(I),
                     Recuperados: Math.round(R),
                     Óbitos: Math.round(D)
                 });
@@ -197,14 +197,14 @@ export default function Simulation() {
         }
 
         // Validação 2: Todos os parâmetros devem estar preenchidos
-        if (!populacaoTotal || !infectadosIniciais || !taxaTransmissao || !taxaRecuperacao || !taxaMortalidade || !duracao) {
+        if (!populacaoTotal || !infetadosIniciais || !taxaTransmissao || !taxaRecuperacao || !taxaMortalidade || !duracao) {
             showToast("Por favor, preencha todos os campos antes de simular.", "error");
             return;
         }
 
         // Conversão de strings para números
         const N = parseFloat(populacaoTotal); // População total
-        const I0 = parseFloat(infectadosIniciais); // Infectados iniciais
+        const I0 = parseFloat(infetadosIniciais); // Infetados iniciais
         const beta = parseFloat(taxaTransmissao); // Taxa de transmissão (β)
         const gamma = parseFloat(taxaRecuperacao); // Taxa de recuperação (γ)
         const mu = parseFloat(taxaMortalidade); // Taxa de mortalidade (μ)
@@ -217,14 +217,14 @@ export default function Simulation() {
         }
 
         // Inicialização do modelo SIRD
-        const S0 = N - I0; // Suscetíveis iniciais = população total - infectados iniciais
+        const S0 = N - I0; // Suscetíveis iniciais = população total - infetados iniciais
         let S = S0; // Suscetíveis
-        let I = I0; // Infectados
+        let I = I0; // Infetados
         let R = 0; // Recuperados
         let D = 0; // Óbitos
         
         // Variáveis para rastreamento de estatísticas
-        let picoInfectados = I; // Maior número de infectados simultâneos
+        let picoInfetados = I; // Maior número de infetados simultâneos
         let diaPico = 0; // Dia em que ocorreu o pico
         
         // Array para guardar dados do gráfico (um ponto por dia)
@@ -234,7 +234,7 @@ export default function Simulation() {
         graficoDados.push({
             dia: 0,
             Suscetíveis: Math.round(S),
-            Infectados: Math.round(I),
+            Infetados: Math.round(I),
             Recuperados: 0,
             Óbitos: 0
         });
@@ -248,13 +248,13 @@ export default function Simulation() {
             // Sub-passos para cada dia (maior precisão numérica)
             for (let substep = 0; substep < passosPorDia; substep++) {
                 // Cálculo das taxas de mudança (equações SIRD)
-                const novosInfectados = (beta * S * I / N) * dt;
+                const novosInfetados = (beta * S * I / N) * dt;
                 const novosRecuperados = gamma * I * (1 - mu) * dt;
                 const novosMortos = gamma * I * mu * dt;
 
                 // Atualiza compartimentos (garante não-negatividade)
-                S = Math.max(0, S - novosInfectados);
-                I = Math.max(0, I + novosInfectados - novosRecuperados - novosMortos);
+                S = Math.max(0, S - novosInfetados);
+                I = Math.max(0, I + novosInfetados - novosRecuperados - novosMortos);
                 R = R + novosRecuperados;
                 D = D + novosMortos;
             }
@@ -263,14 +263,14 @@ export default function Simulation() {
             graficoDados.push({
                 dia: dia,
                 Suscetíveis: Math.round(S),
-                Infectados: Math.round(I),
+                Infetados: Math.round(I),
                 Recuperados: Math.round(R),
                 Óbitos: Math.round(D)
             });
 
-            // Rastreia o pico de infectados (para estatísticas)
-            if (I > picoInfectados) {
-                picoInfectados = I;
+            // Rastreia o pico de infetados (para estatísticas)
+            if (I > picoInfetados) {
+                picoInfetados = I;
                 diaPico = dia;
             }
         }
@@ -281,7 +281,7 @@ export default function Simulation() {
             nome: nomeSimulacao,
             data: new Date().toLocaleDateString("pt-PT"), // Data de criação (formato PT)
             obitos: Math.round(D), // Total de óbitos ao final da simulação
-            pico: Math.round(picoInfectados), // Pico máximo de infectados simultâneos
+            pico: Math.round(picoInfetados), // Pico máximo de infetados simultâneos
             diaPico: diaPico, // Dia em que ocorreu o pico
             recuperados: Math.round(R), // Total de recuperados ao final
             suscetiveisFinais: Math.round(S), // Suscetíveis restantes
@@ -420,7 +420,7 @@ export default function Simulation() {
                                         }}
                                         iconSize={windowWidth <= 768 ? 10 : 14}
                                     />
-                                    <Line type="monotone" dataKey="Infectados" stroke="#e74c3c" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
+                                    <Line type="monotone" dataKey="Infetados" stroke="#e74c3c" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
                                     <Line type="monotone" dataKey="Recuperados" stroke="#2ecc71" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
                                     <Line type="monotone" dataKey="Suscetíveis" stroke="#3498db" strokeWidth={windowWidth <= 768 ? 2 : 2.5} strokeDasharray="5 5" dot={false} />
                                     <Line type="monotone" dataKey="Óbitos" stroke="#34495e" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
@@ -504,11 +504,11 @@ export default function Simulation() {
                                     onChange={(e) => setPopulacaoTotal(e.target.value)}
                                 />
                                 <Input
-                                    label="Infectados Iniciais"
+                                    label="Infetados Iniciais"
                                     type="number"
                                     placeholder="10"
-                                    value={infectadosIniciais}
-                                    onChange={(e) => setInfectadosIniciais(e.target.value)}
+                                    value={infetadosIniciais}
+                                    onChange={(e) => setInfetadosIniciais(e.target.value)}
                                 />
                             </div>
 
@@ -591,7 +591,7 @@ export default function Simulation() {
                             gap: "15px", 
                             marginTop: "30px" 
                         }}>
-                            {/* Card 1 - Pico de Infectados */}
+                            {/* Card 1 - Pico de Infetados */}
                             <div style={{
                                 backgroundColor: "#ffe5e5",
                                 padding: "20px",
@@ -603,7 +603,7 @@ export default function Simulation() {
                                     {resultado.pico.toLocaleString()}
                                 </div>
                                 <div style={{ fontSize: "12px", color: "#666", fontWeight: "500", marginBottom: "3px" }}>
-                                    Pico de Infectados
+                                    Pico de Infetados
                                 </div>
                                 <div style={{ fontSize: "11px", color: "#999" }}>
                                     {((resultado.pico / resultado.populacaoTotal) * 100).toFixed(2)}% da população
@@ -722,7 +722,7 @@ export default function Simulation() {
                                         }}
                                         iconSize={windowWidth <= 768 ? 10 : 14}
                                     />
-                                    <Line type="monotone" dataKey="Infectados" stroke="#e74c3c" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
+                                    <Line type="monotone" dataKey="Infetados" stroke="#e74c3c" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
                                     <Line type="monotone" dataKey="Recuperados" stroke="#2ecc71" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />
                                     <Line type="monotone" dataKey="Suscetíveis" stroke="#3498db" strokeWidth={windowWidth <= 768 ? 2 : 2.5} strokeDasharray="5 5" dot={false} />
                                     <Line type="monotone" dataKey="Óbitos" stroke="#34495e" strokeWidth={windowWidth <= 768 ? 2 : 2.5} dot={false} />

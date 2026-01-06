@@ -1,6 +1,6 @@
 import Badge from '../common/Badge';
 import IconButton from '../common/IconButton';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Key } from 'lucide-react';
 
 /**
  * Componente de linha de utilizador em modo visualização
@@ -9,9 +9,10 @@ import { Edit2, Trash2 } from 'lucide-react';
  * - utilizador: objeto com dados do utilizador (nome, email)
  * - onEdit: callback para ativar modo edição
  * - onDelete: callback para eliminar utilizador
+ * - onChangePassword: callback para alterar password do utilizador
  * - isCurrentUser: boolean indicando se é o utilizador atual (mostra badge "Você")
  */
-export default function UserTableRow({ utilizador, onEdit, onDelete, isCurrentUser }) {
+export default function UserTableRow({ utilizador, onEdit, onDelete, onChangePassword, isCurrentUser }) {
     return (
         <tr style={{ borderBottom: "1px solid #f3f4f6" }}>
             <td style={{ padding: "16px 24px" }}>
@@ -57,6 +58,13 @@ export default function UserTableRow({ utilizador, onEdit, onDelete, isCurrentUs
             </td>
             <td style={{ padding: "16px 24px" }}>
                 <div style={{ display: "flex", gap: "8px" }}>
+                    {/* Botão Alterar Password - abre modal para definir nova password */}
+                    <IconButton
+                        icon={Key}
+                        variant="warning"
+                        onClick={() => onChangePassword(utilizador)}
+                        title="Alterar Password"
+                    />
                     {/* Botão Editar - ativa modo de edição inline */}
                     <IconButton
                         icon={Edit2}
