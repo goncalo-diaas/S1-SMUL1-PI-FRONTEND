@@ -17,11 +17,6 @@ function App() {
         <Route path="/historico" element={<History />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/" element={<Login />} />
-
-        <Route path="/register" element={<Register />} />
-
-        <Route path="/perfil" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
